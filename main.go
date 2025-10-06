@@ -28,6 +28,19 @@ func (m model) Init() tea.Cmd {
 	return nil
 }
 
+// switchScreen changes the current screen and injects window size to the new screen model
+func (m *model) switchScreen(target Screen) {
+	m.currentScreen = target
+	// Pass current window size to new screen model to ensure proper initial rendering
+	sizeMsg := tea.WindowSizeMsg{Width: m.width, Height: m.height}
+	switch target {
+	case ScreenMenu:
+		m.menuModel, _ = m.menuModel.Update(sizeMsg)
+	case ScreenSingleElimination:
+		m.singleElimination, _ = m.singleElimination.Update(sizeMsg)
+	}
+}
+
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -37,7 +50,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "esc":
 			// Go back to menu from any screen
 			if m.currentScreen != ScreenMenu {
-				m.currentScreen = ScreenMenu
+				m.switchScreen(ScreenMenu)
 				return m, nil
 			}
 		}
@@ -46,15 +59,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.height = msg.Height
 	case screenChangeMsg:
 		// Handle screen changes
-		m.currentScreen = msg.screen
-		// Pass current window size to new screen model
-		sizeMsg := tea.WindowSizeMsg{Width: m.width, Height: m.height}
-		switch msg.screen {
-		case ScreenMenu:
-			m.menuModel, _ = m.menuModel.Update(sizeMsg)
-		case ScreenSingleElimination:
-			m.singleElimination, _ = m.singleElimination.Update(sizeMsg)
-		}
+		m.switchScreen(msg.screen)
 		return m, nil
 	}
 
