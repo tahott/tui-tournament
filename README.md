@@ -57,6 +57,28 @@ go run main.go
 
 This project is currently in active development. The tournament selection screen is complete, and the Single Elimination tournament implementation is in progress.
 
+**Current Phase:** Phase 2 - Application Structure Refactoring ✅ COMPLETED
+
+See the [Development Plans](./plans/overview.md) for detailed roadmap and progress.
+
+### Project Structure
+```
+go-tournament/
+├── main.go                           # Entry point, screen routing
+├── screen.go                         # Screen state definitions
+├── menu.go                           # Tournament selection menu
+├── tournament/
+│   └── single_elimination.go         # Single elimination (in progress)
+├── plans/                            # Development planning documents
+│   ├── overview.md                   # Project roadmap
+│   ├── phase1-project-setup.md
+│   ├── phase2-app-structure-refactoring.md
+│   └── phase3-participant-setup.md
+├── go.mod
+├── go.sum
+└── README.md
+```
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit issues and enhancement requests.
