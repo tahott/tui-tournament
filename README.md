@@ -62,7 +62,8 @@ This project is currently in active development. The tournament selection screen
 See the [Development Plans](./plans/overview.md) for detailed roadmap and progress.
 
 ### Project Structure
-```
+
+```text
 go-tournament/
 ├── main.go                           # Entry point, screen routing
 ├── screen.go                         # Screen state definitions

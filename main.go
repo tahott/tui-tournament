@@ -47,6 +47,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case screenChangeMsg:
 		// Handle screen changes
 		m.currentScreen = msg.screen
+		// Pass current window size to new screen model
+		sizeMsg := tea.WindowSizeMsg{Width: m.width, Height: m.height}
+		switch msg.screen {
+		case ScreenMenu:
+			m.menuModel, _ = m.menuModel.Update(sizeMsg)
+		case ScreenSingleElimination:
+			m.singleElimination, _ = m.singleElimination.Update(sizeMsg)
+		}
 		return m, nil
 	}
 
