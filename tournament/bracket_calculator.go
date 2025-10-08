@@ -1,6 +1,6 @@
 package tournament
 
-import "math"
+import "math/bits"
 
 // CalculateRounds calculates the number of rounds needed for a given number of participants.
 // For example:
@@ -12,7 +12,8 @@ func CalculateRounds(participants int) int {
 	if participants <= 1 {
 		return 0
 	}
-	return int(math.Ceil(math.Log2(float64(participants))))
+	// ceil(log2(n)) == bits.Len(n-1) for n>1
+	return bits.Len(uint(participants - 1))
 }
 
 // CalculateBracketSize calculates the bracket size (next power of 2) for a given number of participants.
@@ -26,7 +27,7 @@ func CalculateBracketSize(participants int) int {
 		return 1
 	}
 	rounds := CalculateRounds(participants)
-	return int(math.Pow(2, float64(rounds)))
+	return 1 << rounds
 }
 
 // CalculateByes calculates the number of byes needed for a given number of participants.
