@@ -9,7 +9,7 @@ import "math/bits"
 //   - 5-8 participants -> 3 rounds
 //   - 9-16 participants -> 4 rounds
 func CalculateRounds(participants int) int {
-	if participants <= 1 {
+	if participants < 2 {
 		return 0
 	}
 	// ceil(log2(n)) == bits.Len(n-1) for n>1
@@ -23,7 +23,7 @@ func CalculateRounds(participants int) int {
 //   - 5 participants -> 8
 //   - 12 participants -> 16
 func CalculateBracketSize(participants int) int {
-	if participants <= 1 {
+	if participants < 2 {
 		return 1
 	}
 	rounds := CalculateRounds(participants)

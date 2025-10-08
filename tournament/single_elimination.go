@@ -70,7 +70,7 @@ func (m SingleEliminationModel) Init() tea.Cmd {
 	return nil
 }
 
-func (m SingleEliminationModel) Update(msg tea.Msg) (SingleEliminationModel, tea.Cmd) {
+func (m SingleEliminationModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
