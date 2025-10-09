@@ -56,3 +56,29 @@ func linkMatches(matches []Match, totalRounds int) {
 		match.NextMatchID = findMatchID(matches, nextRound, nextPosition)
 	}
 }
+
+// generateSeedOrder creates the standard bracket seeding order recursively.
+// For a bracket size of n, returns a slice of seed numbers in the order they should appear
+// in the bracket to ensure proper competitive balance (top seeds don't meet until later rounds).
+//
+// Example for size 16:
+//   [1, 16, 8, 9, 4, 13, 5, 12, 2, 15, 7, 10, 3, 14, 6, 11]
+//
+// This creates matchups: 1v16, 8v9, 4v13, 5v12, 2v15, 7v10, 3v14, 6v11
+func generateSeedOrder(size int) []int {
+	if size == 1 {
+		return []int{1}
+	}
+
+	// Get seeding for half bracket
+	prev := generateSeedOrder(size / 2)
+	seeds := []int{}
+
+	// For each seed in previous level, add it and its complement
+	for _, seed := range prev {
+		seeds = append(seeds, seed)
+		seeds = append(seeds, size+1-seed)
+	}
+
+	return seeds
+}
