@@ -54,7 +54,7 @@ func assignPlayers(bracket *Bracket) {
 	realParticipants := len(bracket.Participants)
 
 	matchIdx := 0
-	for i := 0; i < len(seedOrder); i += 2 {
+	for i := 0; i+1 < len(seedOrder); i += 2 {
 		if matchIdx >= len(bracket.Matches) {
 			break
 		}
@@ -127,7 +127,11 @@ func linkMatches(matches []Match, totalRounds int) {
 		// Winner advances to next round, position divided by 2
 		nextRound := match.Round + 1
 		nextPosition := match.Position / 2
-		match.NextMatchID = findMatchID(matches, nextRound, nextPosition)
+		nextMatchID := findMatchID(matches, nextRound, nextPosition)
+		if nextMatchID == -1 {
+			panic(fmt.Sprintf("match linking failed: no match found for round %d, position %d", nextRound, nextPosition))
+		}
+		match.NextMatchID = nextMatchID
 	}
 }
 
@@ -176,6 +180,11 @@ func advancePlayer(bracket *Bracket, nextMatchID int, player *Player) {
 		return
 	}
 
+	// Validate match ID bounds
+	if nextMatchID < 0 || nextMatchID >= len(bracket.Matches) {
+		panic(fmt.Sprintf("invalid match ID: %d (bracket has %d matches)", nextMatchID, len(bracket.Matches)))
+	}
+
 	nextMatch := &bracket.Matches[nextMatchID]
 
 	// Assign to first empty slot
@@ -183,6 +192,8 @@ func advancePlayer(bracket *Bracket, nextMatchID int, player *Player) {
 		nextMatch.Player1 = player
 	} else if nextMatch.Player2 == nil {
 		nextMatch.Player2 = player
+	} else {
+		panic(fmt.Sprintf("match %d has no empty slots for player %d advancement", nextMatchID, player.ID))
 	}
 }
 

@@ -38,7 +38,11 @@ func (m *model) switchScreen(target Screen) {
 		m.menuModel, _ = m.menuModel.Update(sizeMsg)
 	case ScreenSingleElimination:
 		updated, _ := m.singleElimination.Update(sizeMsg)
-		m.singleElimination = updated.(tournament.SingleEliminationModel)
+		if se, ok := updated.(tournament.SingleEliminationModel); ok {
+			m.singleElimination = se
+		} else {
+			panic("type assertion failed: expected tournament.SingleEliminationModel")
+		}
 	}
 }
 
@@ -71,8 +75,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.menuModel, cmd = m.menuModel.Update(msg)
 	case ScreenSingleElimination:
 		updated, c := m.singleElimination.Update(msg)
-		m.singleElimination = updated.(tournament.SingleEliminationModel)
-		cmd = c
+		if se, ok := updated.(tournament.SingleEliminationModel); ok {
+			m.singleElimination = se
+			cmd = c
+		} else {
+			panic("type assertion failed: expected tournament.SingleEliminationModel")
+		}
 	}
 
 	return m, cmd
