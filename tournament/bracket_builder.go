@@ -25,3 +25,34 @@ func generateMatches(bracketSize, totalRounds int) []Match {
 
 	return matches
 }
+
+// findMatchID finds the match ID for a given round and position.
+// Returns -1 if not found.
+func findMatchID(matches []Match, round, position int) int {
+	for _, match := range matches {
+		if match.Round == round && match.Position == position {
+			return match.ID
+		}
+	}
+	return -1
+}
+
+// linkMatches establishes winner advancement paths by setting NextMatchID for each match.
+// Winners advance to the next round at position = currentPosition / 2.
+// The final match has NextMatchID = -1 (no advancement).
+func linkMatches(matches []Match, totalRounds int) {
+	for i := range matches {
+		match := &matches[i]
+
+		// Final match has no next match
+		if match.Round >= totalRounds-1 {
+			match.NextMatchID = -1
+			continue
+		}
+
+		// Winner advances to next round, position divided by 2
+		nextRound := match.Round + 1
+		nextPosition := match.Position / 2
+		match.NextMatchID = findMatchID(matches, nextRound, nextPosition)
+	}
+}
