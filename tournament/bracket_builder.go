@@ -1,5 +1,79 @@
 package tournament
 
+import "fmt"
+
+// NewBracket creates a complete bracket structure from participant count.
+// It orchestrates all bracket generation steps: creating players, generating matches,
+// applying seeding, distributing byes, and linking matches for winner advancement.
+func NewBracket(participantCount int) *Bracket {
+	// 1. Calculate bracket parameters
+	rounds := CalculateRounds(participantCount)
+	bracketSize := CalculateBracketSize(participantCount)
+	byes := CalculateByes(participantCount)
+
+	// 2. Create players with default names and seeding
+	participants := make([]Player, participantCount)
+	for i := 0; i < participantCount; i++ {
+		participants[i] = Player{
+			ID:   i,
+			Name: fmt.Sprintf("Player %d", i+1),
+			Seed: i + 1, // Seed 1 is highest
+		}
+	}
+
+	// 3. Generate all matches
+	matches := generateMatches(bracketSize, rounds)
+
+	// 4. Link matches (winner advancement)
+	linkMatches(matches, rounds)
+
+	// 5. Initialize bracket
+	bracket := &Bracket{
+		Participants: participants,
+		Matches:      matches,
+		TotalRounds:  rounds,
+		BracketSize:  bracketSize,
+		CurrentRound: 0,
+		IsComplete:   false,
+	}
+
+	// 6. Assign seeding to matches
+	assignPlayers(bracket)
+
+	// 7. Distribute byes to top seeds
+	if byes > 0 {
+		assignByes(bracket, byes)
+	}
+
+	return bracket
+}
+
+// assignPlayers assigns players to first round matches based on standard bracket seeding.
+func assignPlayers(bracket *Bracket) {
+	seedOrder := generateSeedOrder(bracket.BracketSize)
+	realParticipants := len(bracket.Participants)
+
+	matchIdx := 0
+	for i := 0; i < len(seedOrder); i += 2 {
+		if matchIdx >= len(bracket.Matches) {
+			break
+		}
+
+		match := &bracket.Matches[matchIdx]
+
+		// Only assign if seed exists (handles non-power-of-2)
+		if seedOrder[i] <= realParticipants {
+			match.Player1 = &bracket.Participants[seedOrder[i]-1]
+		}
+
+		if seedOrder[i+1] <= realParticipants {
+			match.Player2 = &bracket.Participants[seedOrder[i+1]-1]
+		}
+
+		matchIdx++
+	}
+}
+
 // generateMatches creates all matches for a tournament bracket based on bracket size and total rounds.
 // Matches are created round by round, with each round having half the matches of the previous round.
 // Returns a slice of matches with IDs, round numbers, and positions assigned.
