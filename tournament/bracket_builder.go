@@ -82,3 +82,57 @@ func generateSeedOrder(size int) []int {
 
 	return seeds
 }
+
+// findPlayerFirstMatch finds the first match containing the given player.
+// Returns nil if player is not found in any match.
+func findPlayerFirstMatch(bracket *Bracket, player *Player) *Match {
+	for i := range bracket.Matches {
+		match := &bracket.Matches[i]
+		if match.Player1 == player || match.Player2 == player {
+			return match
+		}
+	}
+	return nil
+}
+
+// advancePlayer places a player in the next match after winning.
+// Assigns to the first empty player slot (Player1 or Player2).
+func advancePlayer(bracket *Bracket, nextMatchID int, player *Player) {
+	if nextMatchID == -1 {
+		return
+	}
+
+	nextMatch := &bracket.Matches[nextMatchID]
+
+	// Assign to first empty slot
+	if nextMatch.Player1 == nil {
+		nextMatch.Player1 = player
+	} else if nextMatch.Player2 == nil {
+		nextMatch.Player2 = player
+	}
+}
+
+// assignByes assigns automatic advancement (byes) to top-seeded players.
+// Top seeds skip round 1 when participant count is not a power of 2.
+// The number of byes = bracketSize - participantCount.
+func assignByes(bracket *Bracket, byeCount int) {
+	// Top `byeCount` seeds get byes
+	for i := 0; i < byeCount; i++ {
+		player := &bracket.Participants[i]
+
+		// Find player's first round match
+		match := findPlayerFirstMatch(bracket, player)
+		if match == nil {
+			continue
+		}
+
+		// Mark as bye, assign winner
+		match.IsBye = true
+		match.Player1 = player
+		match.Player2 = nil
+		match.Winner = player
+
+		// Advance player to next match
+		advancePlayer(bracket, match.NextMatchID, player)
+	}
+}
