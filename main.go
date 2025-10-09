@@ -37,7 +37,8 @@ func (m *model) switchScreen(target Screen) {
 	case ScreenMenu:
 		m.menuModel, _ = m.menuModel.Update(sizeMsg)
 	case ScreenSingleElimination:
-		m.singleElimination, _ = m.singleElimination.Update(sizeMsg)
+		updated, _ := m.singleElimination.Update(sizeMsg)
+		m.singleElimination = updated.(tournament.SingleEliminationModel)
 	}
 }
 
@@ -69,7 +70,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case ScreenMenu:
 		m.menuModel, cmd = m.menuModel.Update(msg)
 	case ScreenSingleElimination:
-		m.singleElimination, cmd = m.singleElimination.Update(msg)
+		updated, c := m.singleElimination.Update(msg)
+		m.singleElimination = updated.(tournament.SingleEliminationModel)
+		cmd = c
 	}
 
 	return m, cmd
